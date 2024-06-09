@@ -13,10 +13,18 @@ type ClientTypeDataItem = {
   isVisible: boolean;
 };
 
+type LodgementNames = "Lodged" | "Not Lodged" | "Outstanding" | "Others";
+
+type LatestYearLodgementDistributionItem = {
+  name: LodgementNames;
+  count: number;
+  isVisible: boolean;
+};
+
 type TableDataItem = {
-    ClientType: string;
-    ClientName: string;
-    TFN: number;
-    DueDate?: string;
-    LastYearLodged?: number;
-}
+  ClientType: string;
+  ClientName: string;
+  TFN: number;
+  DueDate?: string;
+  LastYearLodged?: number;
+};

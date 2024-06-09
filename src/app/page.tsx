@@ -43,14 +43,41 @@ const toCamelCase = (input: string): string => {
     .replace(/\s+/g, "");
 };
 
+const parseDate = (dateString: string) => {
+  const parts = dateString.split("/");
+
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1;
+  const year = parseInt(parts[2], 10);
+
+  const date = new Date(year, month, day);
+
+  return date;
+};
+
+const isCurrentDateGreaterThan = (dateString: string) => {
+  const passedDate = parseDate(dateString);
+
+  const currentDate = new Date();
+
+  console.log("dateString", dateString);
+  console.log("currentDate", currentDate);
+  console.log("passedDate", passedDate);
+
+  return currentDate > passedDate;
+};
+
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const barsIconRef = useRef<HTMLButtonElement>(null);
   const [data, setData] = useState<DataItem[]>();
   const [clientTypeData, setClientTypeData] = useState<ClientTypeDataItem[]>();
-  const [activeClientType, setActiveClientType] = useState<string | null>(null);
+  const [latestYearLodgementData, setLatestYearLodgementData] =
+    useState<LatestYearLodgementDistributionItem[]>();
+  const [activeElement, setActiveElement] = useState<string | null>(null);
   const [tableData, setTableData] = useState<TableDataItem[]>();
+  const [latestYear, setLatestYear] = useState<number>(0);
 
   const getClientTypeDistribution = (
     data: DataItem[]
@@ -68,6 +95,60 @@ export default function Home() {
 
     return Object.entries(clientTypeMap).map(([clientType, count]) => ({
       clientType,
+      count,
+      isVisible: true,
+    }));
+  };
+
+  const getLatestYear = (dataItem: DataItem) => {
+    let latestYear = 0;
+
+    Object.keys(dataItem).forEach((key) => {
+      if (/^\d+$/.test(key) && +key > latestYear) {
+        latestYear = +key;
+      }
+    });
+
+    return latestYear;
+  };
+
+  const getLatestYearLodgementData = (
+    data: DataItem[]
+  ): LatestYearLodgementDistributionItem[] | undefined => {
+    if (!data) return;
+
+    const latestYear = getLatestYear(data[0]);
+    setLatestYear(latestYear);
+
+    const lastYearLodgementMap = data.reduce(
+      (
+        acc: {
+          [key in LodgementNames]: number;
+        },
+        item: DataItem
+      ) => {
+        if (item[latestYear] === "Received") {
+          acc.Lodged = (acc.Lodged || 0) + 1;
+        } else if (
+          item[latestYear] === "Not Received" &&
+          !isCurrentDateGreaterThan(item.DueDate)
+        ) {
+          acc["Not Lodged"] = (acc["Not Lodged"] || 0) + 1;
+        } else if (
+          item[latestYear] === "Not Received" &&
+          isCurrentDateGreaterThan(item.DueDate)
+        ) {
+          acc.Outstanding = (acc.Outstanding || 0) + 1;
+        } else {
+          acc.Others = (acc.Others || 0) + 1;
+        }
+        return acc;
+      },
+      { Lodged: 0, "Not Lodged": 0, Outstanding: 0, Others: 0 }
+    );
+
+    return Object.entries(lastYearLodgementMap).map(([name, count]) => ({
+      name: name as LodgementNames,
       count,
       isVisible: true,
     }));
@@ -111,9 +192,13 @@ export default function Home() {
     });
 
     const clientTypeData = getClientTypeDistribution(jsonData);
+    const latestYearLodgementData = getLatestYearLodgementData(jsonData);
+
+    console.log("latestYearLodgementData", latestYearLodgementData);
 
     setData(jsonData);
     setClientTypeData(clientTypeData);
+    setLatestYearLodgementData(latestYearLodgementData);
   };
 
   const formSubmitHandler = (e: FormEvent) => {
@@ -157,30 +242,72 @@ export default function Home() {
   ];
 
   const onPieEnter = (entry: { name: string }, index: number) => {
-    setActiveClientType(entry.name);
+    setActiveElement(entry.name);
   };
 
   const onPieClick = (e: any) => {
+    console.log("e", e);
     const selectedClientType = e.clientType;
-    const clientTypeData: TableDataItem[] = data!
-      .filter((dataItem) => dataItem.ClientType === selectedClientType)
-      .map(({ TFN, ClientName, ClientType }) => ({
-        TFN,
-        ClientName,
-        ClientType,
-      }));
+    const selectedLodgementType = e.name;
+    if (selectedClientType) {
+      const clientTypeData: TableDataItem[] = data!
+        .filter((dataItem) => dataItem.ClientType === selectedClientType)
+        .map(({ TFN, ClientName, ClientType }) => ({
+          TFN,
+          ClientName,
+          ClientType,
+        }));
 
-    setTableData(clientTypeData);
+      setTableData(clientTypeData);
+    } else if (selectedLodgementType) {
+      const lodgmentTypeData: TableDataItem[] = data!
+        .filter((dataItem) => {
+          if (selectedLodgementType === "Lodged") {
+            return dataItem[latestYear] === "Received";
+          } else if (selectedLodgementType === "Not Lodged") {
+            return (
+              dataItem[latestYear] === "Not Received" &&
+              !isCurrentDateGreaterThan(dataItem.DueDate)
+            );
+          } else if (selectedLodgementType === "Outstanding") {
+            return (
+              dataItem[latestYear] === "Not Received" &&
+              isCurrentDateGreaterThan(dataItem.DueDate)
+            );
+          } else {
+            return (
+              dataItem[latestYear] !== "Received" &&
+              dataItem[latestYear] !== "Not Received"
+            );
+          }
+        })
+        .map(({ TFN, ClientName, ClientType, DueDate, LastYearLodged }) => ({
+          TFN,
+          ClientName,
+          ClientType,
+          ...(selectedLodgementType === "Not Lodged" && { DueDate }),
+          ...(selectedLodgementType === "Outstanding" && { LastYearLodged }),
+        }));
+
+      setTableData(lodgmentTypeData);
+    }
   };
 
   const handleLegendClick = (entry: any) => {
-    const newData = clientTypeData!.map((item) => {
+    const newClientTypeData = clientTypeData!.map((item) => {
       if (item.clientType === entry.value) {
         return { ...item, isVisible: !item.isVisible };
       }
       return item;
     });
-    setClientTypeData(newData);
+    const newLatestYearLodgementData = latestYearLodgementData!.map((item) => {
+      if (item.name === entry.value) {
+        return { ...item, isVisible: !item.isVisible };
+      }
+      return item;
+    });
+    setClientTypeData(newClientTypeData);
+    setLatestYearLodgementData(newLatestYearLodgementData);
   };
 
   return (
@@ -284,7 +411,7 @@ export default function Home() {
             labelLine={false}
             onMouseEnter={onPieEnter}
             onClick={onPieClick}
-            onMouseLeave={() => setActiveClientType(null)}
+            onMouseLeave={() => setActiveElement(null)}
           >
             {clientTypeData?.map(
               (entry, index) =>
@@ -292,8 +419,8 @@ export default function Home() {
                   <Cell
                     key={`cell-${entry.clientType}`}
                     fill={
-                      activeClientType === null ||
-                      activeClientType === entry.clientType
+                      activeElement === null ||
+                      activeElement === entry.clientType
                         ? COLORS[index % COLORS.length]
                         : `${COLORS[index % COLORS.length]}80`
                     }
@@ -312,7 +439,61 @@ export default function Home() {
                 type: "square",
                 color: !isVisible
                   ? `${COLORS[index % COLORS.length]}80`
-                  : activeClientType === null || activeClientType === clientType
+                  : activeElement === null || activeElement === clientType
+                  ? COLORS[index % COLORS.length]
+                  : `${COLORS[index % COLORS.length]}80`,
+              })
+            )}
+          />
+          <Tooltip
+            content={
+              <CustomTooltip
+                active={false}
+                payload={[{ name: "", value: "", payload: { fill: "" } }]}
+              />
+            }
+          />
+        </PieChart>
+      ) : null}
+      {latestYearLodgementData ? (
+        <PieChart width={730} height={250} style={{ cursor: "pointer" }}>
+          <Pie
+            data={latestYearLodgementData?.filter((item) => item.isVisible)}
+            dataKey="count"
+            nameKey="name"
+            fill="#82ca9d"
+            label
+            labelLine={false}
+            onMouseEnter={onPieEnter}
+            onClick={onPieClick}
+            onMouseLeave={() => setActiveElement(null)}
+          >
+            {latestYearLodgementData?.map(
+              (entry, index) =>
+                entry.isVisible && (
+                  <Cell
+                    key={`cell-${entry.name}`}
+                    fill={
+                      activeElement === null || activeElement === entry.name
+                        ? COLORS[index % COLORS.length]
+                        : `${COLORS[index % COLORS.length]}80`
+                    }
+                  />
+                )
+            )}
+          </Pie>
+          <Legend
+            layout="vertical"
+            align="right"
+            verticalAlign="middle"
+            onClick={handleLegendClick}
+            payload={latestYearLodgementData?.map(
+              ({ name, count, isVisible }, index) => ({
+                value: name,
+                type: "square",
+                color: !isVisible
+                  ? `${COLORS[index % COLORS.length]}80`
+                  : activeElement === null || activeElement === name
                   ? COLORS[index % COLORS.length]
                   : `${COLORS[index % COLORS.length]}80`,
               })
@@ -339,7 +520,7 @@ export default function Home() {
                 {!!tableData?.[0]?.DueDate && (
                   <th className="px-4 py-2 text-left font-bold">Due Date</th>
                 )}
-                {!!tableData?.[0]?.LastYearLodged && (
+                {tableData?.[0]?.LastYearLodged !== undefined && (
                   <th className="px-4 py-2 text-left font-bold">
                     Last lodgement year
                   </th>
