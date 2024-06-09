@@ -50,6 +50,7 @@ export default function Home() {
   const [data, setData] = useState<DataItem[]>();
   const [clientTypeData, setClientTypeData] = useState<ClientTypeDataItem[]>();
   const [activeClientType, setActiveClientType] = useState<string | null>(null);
+  const [tableData, setTableData] = useState<TableDataItem[]>();
 
   const getClientTypeDistribution = (
     data: DataItem[]
@@ -88,6 +89,10 @@ export default function Home() {
     excelData.slice(1).forEach((rowData) => {
       const data: DataItem = {
         ClientType: "",
+        ClientName: "",
+        DueDate: "",
+        LastYearLodged: 0,
+        TFN: 0,
       };
 
       rowData.forEach((dataItem, index) => {
@@ -156,7 +161,16 @@ export default function Home() {
   };
 
   const onPieClick = (e: any) => {
-    console.log("Pie click", e);
+    const selectedClientType = e.clientType;
+    const clientTypeData: TableDataItem[] = data!
+      .filter((dataItem) => dataItem.ClientType === selectedClientType)
+      .map(({ TFN, ClientName, ClientType }) => ({
+        TFN,
+        ClientName,
+        ClientType,
+      }));
+
+    setTableData(clientTypeData);
   };
 
   const handleLegendClick = (entry: any) => {
@@ -259,7 +273,7 @@ export default function Home() {
           </div>
         </div>
       </main>
-      {data ? (
+      {clientTypeData ? (
         <PieChart width={730} height={250} style={{ cursor: "pointer" }}>
           <Pie
             data={clientTypeData?.filter((item) => item.isVisible)}
@@ -283,7 +297,6 @@ export default function Home() {
                         ? COLORS[index % COLORS.length]
                         : `${COLORS[index % COLORS.length]}80`
                     }
-                    // style={{ display: entry.isVisible ? "block" : "none" }}
                   />
                 )
             )}
@@ -292,12 +305,6 @@ export default function Home() {
             layout="vertical"
             align="right"
             verticalAlign="middle"
-            // data={[
-            //   { name: "A", color: "#6C8EBF" },
-            //   { name: "B", color: "#A1E8AF" },
-            //   { name: "C", color: "#FFB6C1" },
-            //   { name: "D", color: "#E6E6FA" },
-            // ]}
             onClick={handleLegendClick}
             payload={clientTypeData?.map(
               ({ clientType, count, isVisible }, index) => ({
@@ -310,17 +317,6 @@ export default function Home() {
                   : `${COLORS[index % COLORS.length]}80`,
               })
             )}
-            // content={
-            //   <CustomLegend
-            //     onClick={handleLegendClick}
-            //     payload={clientTypeData?.map(
-            //       ({ clientType, count, isVisible }, index) => ({
-            //         value: clientType,
-            //         type: "square",
-            //       })
-            //     )}
-            //   />
-            // }
           />
           <Tooltip
             content={
@@ -332,64 +328,61 @@ export default function Home() {
           />
         </PieChart>
       ) : null}
+      {tableData ? (
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-[0.5px]">
+            <thead className="border-[0.5px]">
+              <tr>
+                <th className="px-4 py-2 text-left font-bold">TFN</th>
+                <th className="px-4 py-2 text-left font-bold">Client Name</th>
+                <th className="px-4 py-2 text-left font-bold">Client Type</th>
+                {!!tableData?.[0]?.DueDate && (
+                  <th className="px-4 py-2 text-left font-bold">Due Date</th>
+                )}
+                {!!tableData?.[0]?.LastYearLodged && (
+                  <th className="px-4 py-2 text-left font-bold">
+                    Last lodgement year
+                  </th>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {tableData.map(
+                (
+                  { TFN, ClientName, ClientType, DueDate, LastYearLodged },
+                  index
+                ) => (
+                  <tr
+                    key={TFN}
+                    className={`${index % 2 === 1 ? "bg-gray-900" : ""}`}
+                  >
+                    <td className="px-4 py-2 text-left text-gray-300">{TFN}</td>
+                    <td className="px-4 py-2 text-left text-gray-300">
+                      {ClientName}
+                    </td>
+                    <td className="px-4 py-2 text-left text-gray-300">
+                      {ClientType}
+                    </td>
+                    {!!DueDate && (
+                      <td className="px-4 py-2 text-left text-gray-300">
+                        {DueDate}
+                      </td>
+                    )}
+                    {!!LastYearLodged && (
+                      <td className="px-4 py-2 text-left text-gray-300">
+                        {LastYearLodged}
+                      </td>
+                    )}
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
     </>
   );
 }
-
-// const CustomLegend = (props: {
-//   payload: any;
-//   onClick: (entry: { value: string; color: string }) => void;
-// }) => {
-//   const { payload, onClick } = props;
-
-//   return (
-//     // <ul>
-//     //   {payload.map((entry, index) => (
-//     //     <li key={`item-${index}`}>{entry.value}</li>
-//     //   ))}
-//     // </ul>
-//     <ul
-//       className="recharts-default-legend"
-//       style={{ padding: 0, margin: 0, textAlign: "left" }}
-//     >
-//       {payload.map((entry: { value: string; color: string }, index: number) => (
-//         <li
-//           className={`recharts-legend-item legend-item-${index}`}
-//           style={{ display: "block", marginRight: 10 }}
-//           key={entry.value}
-//           onClick={() => onClick(entry)}
-//         >
-//           <svg
-//             className="recharts-surface"
-//             width="14"
-//             height="14"
-//             viewBox="0 0 32 32"
-//             style={{
-//               display: "inline-block",
-//               verticalAlign: "middle",
-//               marginRight: 4,
-//             }}
-//           >
-//             <title></title>
-//             <desc></desc>
-//             <path
-//               fill={entry.color}
-//               d="M0,4h32v24h-32z"
-//               className="recharts-legend-icon"
-//               stroke="none"
-//             ></path>
-//           </svg>
-//           <span
-//             className="recharts-legend-item-text"
-//             style={{ color: entry.color }}
-//           >
-//             {entry.value}
-//           </span>
-//         </li>
-//       ))}
-//     </ul>
-//   );
-// };
 
 const CustomTooltip = ({
   active,
