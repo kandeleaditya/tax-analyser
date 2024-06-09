@@ -1,6 +1,10 @@
 type DataItem = {
-  [key: string]: string | Date;
   ClientType: string;
+  ClientName: string;
+  DueDate: string;
+  LastYearLodged: number;
+  TFN: number;
+  [key: string]: string | Date | number;
 };
 
 type ClientTypeDataItem = {
@@ -8,3 +12,11 @@ type ClientTypeDataItem = {
   count: number;
   isVisible: boolean;
 };
+
+type TableDataItem = {
+    ClientType: string;
+    ClientName: string;
+    TFN: number;
+    DueDate?: string;
+    LastYearLodged?: number;
+}
