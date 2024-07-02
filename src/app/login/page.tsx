@@ -1,6 +1,6 @@
 import LoginForm from "@/components/login-form";
 
-export default function LoginPage() {
+export default async function LoginPage() {
   return (
     <>
       <section>

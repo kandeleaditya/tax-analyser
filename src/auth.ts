@@ -1,35 +1,57 @@
-import NextAuth from "next-auth"
-import Credentials from "next-auth/providers/credentials"
-// Your own logic for dealing with plaintext password strings; be careful!
-//import { saltAndHashPassword } from "@/utils/password"
- 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+import NextAuth from "next-auth";
+
+import CredentialsProvider from "next-auth/providers/credentials";
+
+import userData from '@/dummy.json';
+
+export const {
+  handlers,
+  auth,
+} = NextAuth({
+  session: { strategy: 'jwt' },
+
   providers: [
-    Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
+    CredentialsProvider({
+
       credentials: {
-        email: {},
-        password: {},
+        username: {},
+        password: {}
       },
-      authorize: async (credentials) => {
-        let user = null
- 
-        // logic to salt and hash password
-        //const pwHash = saltAndHashPassword(credentials.password)
- 
-        // logic to verify if user exists
-        //user = await getUserFromDb(credentials.email, pwHash)
- 
-        if (!user) {
-          // No user found, so this is their first attempt to login
-          // meaning this is also the place you could do registration
-          throw new Error("User not found.")
+
+      async authorize(credentials) {
+
+        const username = credentials.username;
+        const password = credentials.password;
+
+        console.log(username);
+        console.log(password);
+
+        let flag=false;
+        let user = {}
+
+        for (var index in userData.users) {
+
+          let record = userData.users[index];
+          
+          if(record.username==username) {
+            if(record.password==password) {
+              user = {
+                id: record.id,
+                name: record.username,
+              }
+              flag=true;
+              break;
+            } 
+          }
         }
- 
-        // return user object with the their profile data
-        return user
-      },
-    }),
+
+        if(flag) {
+          return user;
+        }
+
+        return null;
+
+      }
+    })
   ],
 })
