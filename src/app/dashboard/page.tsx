@@ -1,5 +1,6 @@
 "use client";
 
+import LogoutButton from "@/components/logout-btn";
 import { FormEvent, useRef, useState } from "react";
 import { PieChart, Pie, Legend, Tooltip, Cell } from "recharts";
 import * as XLSX from "xlsx";
@@ -359,9 +360,7 @@ export default function Home() {
             </ul>
           </nav>
           <div className="py-4 px-6 border-t border-gray-700">
-            <a href="#" className="block">
-              Logout
-            </a>
+            <LogoutButton />
           </div>
         </div>
 
