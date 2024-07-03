@@ -12,6 +12,7 @@
     "clearCache": "npm cache clear --force"
   },
   "dependencies": {
+    "better-sqlite3": "^11.1.2",
     "next": "14.2.3",
     "next-auth": "^5.0.0-beta.19",
     "react": "^18",
