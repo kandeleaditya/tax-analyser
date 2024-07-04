@@ -13,7 +13,7 @@ type ClientTypeDataItem = {
   isVisible: boolean;
 };
 
-type LodgementNames = "Lodged" | "Not Lodged" | "Outstanding" | "Others";
+type LodgementNames = 'Lodged' | 'Not Lodged' | 'Outstanding' | 'Others';
 
 type LatestYearLodgementDistributionItem = {
   name: LodgementNames;

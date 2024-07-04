@@ -1,25 +1,25 @@
 {
-    "title": "Dummy Login User data",
-    "users": [
-        {
-            "id": 1,
-            "username": "aditya",
-            "password": "aditya"
-        },
-        {
-            "id": 2,
-            "username": "abhineet",
-            "password": "abhineet"
-        },
-        {
-            "id": 3,
-            "username": "admin",
-            "password": "password"
-        },
-        {
-            "id": 4,
-            "username": "admin",
-            "password": "manage"
-        }
-    ]
+  "title": "Dummy Login User data",
+  "users": [
+    {
+      "id": 1,
+      "username": "aditya",
+      "password": "aditya"
+    },
+    {
+      "id": 2,
+      "username": "abhineet",
+      "password": "abhineet"
+    },
+    {
+      "id": 3,
+      "username": "admin",
+      "password": "password"
+    },
+    {
+      "id": 4,
+      "username": "admin",
+      "password": "manage"
+    }
+  ]
 }
