@@ -1,3 +1,1 @@
-export default function MainHeader(){
-    
-}
+export default function MainHeader() {}
