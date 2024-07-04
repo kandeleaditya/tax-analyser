@@ -1,14 +1,37 @@
-var sql = require("better-sqlite3");
-var db = sql("tax_analyser.db");
-var createUserTableStmt =
-  "\n   CREATE TABLE IF NOT EXISTS users (\n      id int unsigned AUTO_INCREMENT PRIMARY KEY,\n      username varchar(255) NOT NULL UNIQUE,\n      name varchar(255) NOT NULL,\n      email varchar(255) NOT NULL UNIQUE,\n      phone varchar(20),\n      status VARCHAR(20) CHECK(status IN ('active', 'inactive')) NOT NULL,\n      plan_end_date date,\n      DBPrefix varchar(20),\n      Password varchar(255) NOT NULL\n   )\n";
+const sql = require('better-sqlite3');
+const db = sql('tax_analyser.db');
+
+const createUserTableStmt = `
+   CREATE TABLE IF NOT EXISTS users (
+      id int unsigned AUTO_INCREMENT PRIMARY KEY,
+      username varchar(255) NOT NULL UNIQUE,
+      name varchar(255) NOT NULL,
+      email varchar(255) NOT NULL UNIQUE,
+      phone varchar(20),
+      status VARCHAR(20) CHECK(status IN ('active', 'inactive')) NOT NULL,
+      plan_end_date date,
+      DBPrefix varchar(20),
+      Password varchar(255) NOT NULL
+   )`;
+
+const createUserTableStmt = `
+   CREATE TABLE IF NOT EXISTS users (
+      id int unsigned AUTO_INCREMENT PRIMARY KEY,
+      username varchar(255) NOT NULL UNIQUE,
+      name varchar(255) NOT NULL,
+      email varchar(255) NOT NULL UNIQUE,
+      phone varchar(20),
+      status VARCHAR(20) CHECK(status IN ('active', 'inactive')) NOT NULL,
+      plan_end_date date,
+      DBPrefix varchar(20),
+      Password varchar(255) NOT NULL
+   )`;
+
 try {
   db.prepare(createUserTableStmt).run();
-  console.log(
-    "Users table created successfully (if it did not exist already)."
-  );
+  console.log('Users table created successfully (if it did not exist already).');
 } catch (error) {
-  console.error("Error creating Users table:", error.message);
+  console.error('Error creating Users table:', error.message);
 }
 db.close();
 
