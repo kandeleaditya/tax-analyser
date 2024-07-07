@@ -1,6 +1,6 @@
 'use client';
 
-import LogoutButton from '@/components/logout-btn';
+import LogoutButton from '@/components/login-logout/logout-btn';
 import { FormEvent, useRef, useState } from 'react';
 import { PieChart, Pie, Legend, Tooltip, Cell } from 'recharts';
 import * as XLSX from 'xlsx';

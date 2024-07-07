@@ -10,21 +10,8 @@ const createUserTableStmt = `
       phone varchar(20),
       status VARCHAR(20) CHECK(status IN ('active', 'inactive')) NOT NULL,
       plan_end_date date,
-      DBPrefix varchar(20),
-      Password varchar(255) NOT NULL
-   )`;
-
-const createUserTableStmt = `
-   CREATE TABLE IF NOT EXISTS users (
-      id int unsigned AUTO_INCREMENT PRIMARY KEY,
-      username varchar(255) NOT NULL UNIQUE,
-      name varchar(255) NOT NULL,
-      email varchar(255) NOT NULL UNIQUE,
-      phone varchar(20),
-      status VARCHAR(20) CHECK(status IN ('active', 'inactive')) NOT NULL,
-      plan_end_date date,
-      DBPrefix varchar(20),
-      Password varchar(255) NOT NULL
+      db_prefix varchar(20),
+      password varchar(255) NOT NULL
    )`;
 
 try {

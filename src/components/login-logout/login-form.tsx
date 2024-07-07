@@ -1,44 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useFormState } from 'react-dom';
+import { checkLogin } from '@/lib/auth-actions';
+import LoginButton from './login-btn';
 
 const initialState = {
   message: '',
 };
 
 export default function LoginForm() {
-  const router = useRouter();
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const handleAuth = (event: React.MouseEvent<HTMLButtonElement>) => {
-    signIn(event.currentTarget.name, { callbackUrl: '/dashboard' });
-  };
-
-  const handleCredentials = async (formData: FormData) => {
-    const response = await signIn('credentials', {
-      username: formData.get('username') as string,
-      password: formData.get('password') as string,
-      redirect: false,
-    });
-
-    if (response && response.error) {
-      setErrorMessage('Incorrect Username or Password');
-      console.log(response.error);
-    } else {
-      router.push('/dashboard');
-    }
-  };
+  const [errorMessage, formAction, isPending] = useFormState(checkLogin, undefined);
 
   return (
-    <form
-      className="space-y-4 md:space-y-6"
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleCredentials(new FormData(e.target as HTMLFormElement));
-      }}
-    >
+    <form className="space-y-4 md:space-y-6" action={formAction}>
       <div>
         <label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
           Username
@@ -65,9 +39,7 @@ export default function LoginForm() {
           required
         />
       </div>
-      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg">
-        Login
-      </button>
+      <LoginButton></LoginButton>
       {errorMessage && <p className="text-red-600">{errorMessage}</p>}
     </form>
   );

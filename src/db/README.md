@@ -1,5 +1,11 @@
 # tax-analyser Database Schema
 
+# DB initialization
+
+node src/db/initdb.js
+
+# sceham and details in database
+
 Generic User table
 Generic Client type table
 
