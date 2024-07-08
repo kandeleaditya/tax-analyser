@@ -38,12 +38,14 @@ import { getUserDB } from '@/lib/db';
 import userData from '@/dummy.json';
 
 export const { handlers, auth } = NextAuth({
+export const { handlers, auth } = NextAuth({
   session: { strategy: 'jwt' },
 
   providers: [
     CredentialsProvider({
       credentials: {
         username: {},
+        password: {},
         password: {},
       },
 
@@ -65,21 +67,30 @@ export const { handlers, auth } = NextAuth({
 
           if (record.username == username) {
             if (record.password == password) {
+
+          if (record.username == username) {
+            if (record.password == password) {
               user = {
                 id: record.id,
                 name: record.username,
               };
               flag = true;
+              };
+              flag = true;
               break;
+            }
             }
           }
         }
 
         if (flag) {
+        if (flag) {
           return user;
         }
 
         return null;
+      },
+    }),
       },
     }),
   ],
