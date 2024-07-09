@@ -3,7 +3,7 @@ import { useFormStatus } from 'react-dom';
 
 export default function LoginButton() {
   const { pending } = useFormStatus();
-  //console.log('adi pending', pending);
+
   return (
     <button
       type="submit"
