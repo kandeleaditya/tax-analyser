@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "clean": "rm -rf node_modules && npm cache clear --force",
-    "cleanWin": "rm -r -fo node_modules",
+    "cleanWin": "rmdir /s node_modules clearCache",
     "clearCache": "npm cache clear --force",
     "format": "prettier --write ."
   },
