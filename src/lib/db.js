@@ -39,28 +39,5 @@ export async function getUserDB(username) {
     console.log('DB get user failed.');
   }
 
-  console.log('adi getUserDB user', user);
   return user;
 }
-
-/* 
-const insertUser = db.prepare('INSERT INTO users (username, name, email, phone, status, plan_end_date, DBPrefix, Password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-
-// Example usage:
-
-const username = 'johndoe';
-const name = 'John Doe';
-const email = 'johndoe@example.com';
-const phone = '1234567890';
-const status = 'active';
-const planEndDate = '2024-12-31';  // Date in YYYY-MM-DD format
-const dbPrefix = 'user_';
-const password = 'hashed_password';  // Assuming the password is already hashed
-
-const result = insertUser.run(username, name, email, phone, status, planEndDate, dbPrefix, password);
-
-if (result.changes !== 1) {
-  console.error('User creation failed:', result);
-} else {
-  console.log('User created successfully!');
-} */
