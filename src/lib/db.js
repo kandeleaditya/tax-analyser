@@ -41,3 +41,39 @@ export async function getUserDB(username) {
 
   return user;
 }
+
+export async function insertClientListData(clientList) {
+  const insert = db.prepare(
+    'INSERT OR REPLACE INTO client_list (client_type, client_name, tfn, last_year_lodged, db_prefix) VALUES (@ClientType, @ClientName, @TFN, @LastYearLodged, @db_prefix)'
+  );
+
+  const insertMany = db.transaction((clientList) => {
+    for (const clientItem of clientList) insert.run(clientItem);
+  });
+
+  const result = insertMany(clientList);
+
+  // if (result.changes !== 1) {
+  //   console.error('Client list update failed:', result);
+  // } else {
+  //   console.log('Client list updated successfully!');
+  // }
+}
+
+export async function insertYearlyData(yearlyData) {
+  const insert = db.prepare(
+    'INSERT OR REPLACE INTO yearly_data (year, due_date, status, tfn, db_prefix) VALUES (@year, @DueDate, @status, @TFN, @db_prefix)'
+  );
+
+  const insertMany = db.transaction((yearlyData) => {
+    for (const yearlyItem of yearlyData) insert.run(yearlyItem);
+  });
+
+  const result = insertMany(yearlyData);
+
+  // if (result.changes !== 1) {
+  //   console.error('Yearly data insertion failed:', result);
+  // } else {
+  //   console.log('Yearly data inserted successfully!');
+  // }
+}
