@@ -1,9 +1,10 @@
 import sql from 'better-sqlite3';
+import { PrismaClient } from '@prisma/client';
 
 //const sql = require('better-sqlite3');
 const db = sql('tax_analyser.db');
 
-export async function insertUserDB(username, password) {
+/* export async function insertUserDB(username, password) {
   // TODO: Add database connection
 
   const insertUserStmt = db.prepare(
@@ -13,7 +14,7 @@ export async function insertUserDB(username, password) {
   // const username = 'johndoe';
   // const password = 'hashed_password'; // Assuming the password is already hashed
   const name = 'John Doe';
-  const email = 'johndoe@example.com';
+  const email = 'johndoe1@example.com';
   const phone = '1234567890';
   const status = 'active';
   const plan_end_date = '2024-12-31'; // Date in YYYY-MM-DD format
@@ -26,8 +27,8 @@ export async function insertUserDB(username, password) {
   } else {
     console.log('User created successfully!');
   }
-}
-
+} */
+/* 
 export async function getUserDB(username) {
   const getUserStmt = db.prepare('SELECT * FROM users WHERE username = ?');
 
@@ -40,7 +41,7 @@ export async function getUserDB(username) {
   }
 
   return user;
-}
+} */
 
 export async function insertClientListData(clientList) {
   const insert = db.prepare(
@@ -76,4 +77,45 @@ export async function insertYearlyData(yearlyData) {
   // } else {
   //   console.log('Yearly data inserted successfully!');
   // }
+}
+
+const prisma = new PrismaClient();
+
+export async function insertUserDB(username, password) {
+  try {
+    const user = await prisma.user.create({
+      data: {
+        username,
+        name: 'John Doe',
+        email: 'johndoe2@example.com',
+        phone: '1234567890',
+        status: 'active',
+        planEndDate: '2024-12-31T00:00:00.000Z',
+        dbPrefix: 'user_',
+        password,
+      },
+    });
+    console.log('User created successfully!');
+  } catch (err) {
+    console.error('Error creating user:', err);
+  }
+}
+
+export async function getUserDB(username) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+    if (user) {
+      console.log('DB get user successful!', user);
+    } else {
+      console.log('DB get user failed.');
+    }
+    return user;
+  } catch (err) {
+    console.error('Error retrieving user:', err);
+    return null;
+  }
 }
