@@ -2,6 +2,50 @@
 
 SOme prisma useful cmds
 
+npx prisma db push
+npx prisma generate
+npx prisma migrate dev --name init
+
+## 0. Make sure you have all the database details in env file
+
+## 1. Run the command in the postgres database to create table
+
+`CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(255) NOT NULL UNIQUE,
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL UNIQUE,
+      phone VARCHAR(20),
+      status VARCHAR(20) CHECK(status IN ('active', 'inactive')) NOT NULL,
+      plan_end_date DATE,
+      db_prefix VARCHAR(20),
+      password VARCHAR(255) NOT NULL
+);`
+
+`SELECT
+    table_schema || '.' || table_name as show_tables
+FROM
+    information_schema.tables
+WHERE
+    table_type = 'BASE TABLE'
+AND
+    table_schema NOT IN ('pg_catalog', 'information_schema');`
+
+`select column_name, data_type, character_maximum_length
+ from INFORMATION_SCHEMA.COLUMNS where table_name ='table_name';`
+
+### use below command to delete the table
+
+`DROP TABLE IF EXISTS users;`
+
+## 2. run server locally using ''npm run dev'' and run 'node src/lib/createInternalUser.js <username> <password>'
+
+This will connect to the databse and create a user in the database with the given username and password. ALl the other values will be taken from file src/lib/db.js using function insertUserDB().
+
+# tax-analyser Database Schema - Postgres
+
+SOme prisma useful cmds
+
 prisma db push --force-reset
 
 npx prisma db push
