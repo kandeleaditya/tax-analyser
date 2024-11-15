@@ -43,7 +43,7 @@ export async function getUserDB(username) {
   return user;
 } */
 
-export async function insertClientListData(clientList) {
+/* export async function insertClientListData(clientList) {
   const insert = db.prepare(
     'INSERT OR REPLACE INTO client_list (client_type, client_name, tfn, last_year_lodged, db_prefix) VALUES (@ClientType, @ClientName, @TFN, @LastYearLodged, @db_prefix)'
   );
@@ -60,8 +60,8 @@ export async function insertClientListData(clientList) {
   //   console.log('Client list updated successfully!');
   // }
 }
-
-export async function insertYearlyData(yearlyData) {
+ */
+/* export async function insertYearlyData(yearlyData) {
   const insert = db.prepare(
     'INSERT OR REPLACE INTO yearly_data (year, due_date, status, tfn, db_prefix) VALUES (@year, @DueDate, @status, @TFN, @db_prefix)'
   );
@@ -77,7 +77,7 @@ export async function insertYearlyData(yearlyData) {
   // } else {
   //   console.log('Yearly data inserted successfully!');
   // }
-}
+} */
 
 const prisma = new PrismaClient();
 
@@ -117,5 +117,45 @@ export async function getUserDB(username) {
   } catch (err) {
     console.error('Error retrieving user:', err);
     return null;
+  }
+}
+
+export async function insertClientListData(data) {
+  //console.log('adi db js clientList', data);
+  try {
+    const result = await prisma.clientList.createMany({
+      data: data.map((item) => ({
+        clientType: item.ClientType,
+        clientName: item.ClientName,
+        tfn: item.TFN.toString().trim(),
+        lastYearLodged: item.LastYearLodged,
+        dbPrefix: item.db_prefix,
+      })),
+    });
+    console.log('Client list data inserted successfully:', result);
+  } catch (error) {
+    console.error('Error inserting client list data:', error);
+  }
+}
+
+export async function insertYearlyData(data) {
+  //console.log('adi db js yearlyData', data);
+  try {
+    const result = await prisma.yearlyData.createMany({
+      data: data.map((item) => {
+        const [year, month, day] = item.DueDate.split('/');
+        const dueDate = new Date(year, month - 1, day).toISOString();
+        return {
+          year: parseInt(item.year),
+          dueDate: dueDate,
+          status: item.status,
+          tfn: item.TFN.toString().trim(),
+          dbPrefix: item.db_prefix,
+        };
+      }),
+    });
+    console.log('Yearly data inserted successfully:', result);
+  } catch (error) {
+    console.error('Error inserting yearly data:', error);
   }
 }

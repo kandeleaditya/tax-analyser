@@ -49,17 +49,10 @@ model YearlyData {
   id         Int      @id @default(autoincrement())
   year       Int
   dueDate    DateTime @map("due_date") @db.Date
-  status     YearlyDataStatus
+  status     String
   tfn        String
   dbPrefix   String   @map("db_prefix")
 
   @@unique([year, tfn], name: "Unique_year_tfn")
   @@map("yearly_data")
-}
-
-enum YearlyDataStatus {
-  Received
-  NotReceived
-  NotRequired
-  ReturnNotNecessary
 }
