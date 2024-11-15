@@ -2,6 +2,8 @@
 
 SOme prisma useful cmds
 
+prisma db push --force-reset
+
 npx prisma db push
 npx prisma generate
 npx prisma migrate dev --name init
