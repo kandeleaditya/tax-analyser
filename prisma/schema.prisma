@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+enum Status {
+  active
+  inactive
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  username   String @unique
+  name       String 
+  email      String @unique
+  phone      String
+  status     Status  @default(active)
+  planEndDate DateTime @map("plan_end_date") @db.Date
+  dbPrefix   String @map("db_prefix")
+  password   String
+
+  @@map("users")
+}
+
+model ClientList {
+  id         Int      @id @default(autoincrement())
+  clientType String @map("client_type")
+  clientName String @map("client_name")
+  tfn        String   @unique
+  lastYearLodged Int @map("last_year_lodged")
+  dbPrefix   String  @map("db_prefix")
+
+  @@map("client_list")
+}
+
+
+model YearlyData {
+  id         Int      @id @default(autoincrement())
+  year       Int
+  dueDate    DateTime @map("due_date") @db.Date
+  status     String
+  tfn        String
+  dbPrefix   String   @map("db_prefix")
+
+  @@unique([year, tfn], name: "Unique_year_tfn")
+  @@map("yearly_data")
+}

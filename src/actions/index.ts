@@ -7,6 +7,7 @@ function isNumeric(value: string) {
 }
 
 export async function uploadExcelData(excelJsonData: DataItem[]) {
+  //console.log('adi excelJsonData', excelJsonData);
   await insertClientListData(excelJsonData);
 
   const yearsArr = Object.keys(excelJsonData?.[0]).filter(isNumeric);
