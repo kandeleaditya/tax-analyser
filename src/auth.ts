@@ -14,9 +14,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const user = await getUserDB(username);
 
-        const passwordsMatch = verifyPassword(user.password, password);
+        if (user) {
+          const passwordsMatch = verifyPassword(user.password, password);
+          if (passwordsMatch) {
+            const userAvailable = {
+              id: user.id.toString(),
+              username: user.username,
+              name: user.name,
+              email: user.email,
+              phone: user.phone,
+              status: user.status,
+              planEndDate: user.planEndDate,
+              dbPrefix: user.dbPrefix,
+              password: user.password,
+            };
 
-        if (passwordsMatch) return user;
+            return userAvailable;
+          }
+        }
 
         return null;
       },
